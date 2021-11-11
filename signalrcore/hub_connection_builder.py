@@ -38,6 +38,12 @@ class HubConnectionBuilder(object):
         self.skip_negotiation = False  # By default do not skip negotiation
         self.running = False
 
+        self.ping_interval = 0
+        self.proxy_type = None
+        self.http_proxy_host = None
+        self.http_proxy_port = None
+        self.skip_utf8_validation = False
+
     def with_url(
             self,
             hub_url: str,
@@ -102,6 +108,13 @@ class HubConnectionBuilder(object):
 
             self.skip_negotiation = "skip_negotiation" in options.keys()\
                 and options["skip_negotiation"]
+
+        if options is not None:
+            self.ping_interval = options.get("ping_interval", 0)
+            self.proxy_type = options.get("proxy_type", None)
+            self.http_proxy_host = options.get("http_proxy_host", None)
+            self.http_proxy_port = options.get("http_proxy_port", None)
+            self.skip_utf8_validation = options.get("skip_utf8_validation", False)
 
         self.hub_url = hub_url
         self.hub = None
@@ -183,7 +196,12 @@ class HubConnectionBuilder(object):
                 reconnection_handler=self.reconnection_handler,
                 verify_ssl=self.verify_ssl,
                 skip_negotiation=self.skip_negotiation,
-                enable_trace=self.enable_trace)\
+                enable_trace=self.enable_trace,
+                ping_interval=self.ping_interval,
+                proxy_type=self.proxy_type,
+                http_proxy_host=self.http_proxy_host,
+                http_proxy_port=self.http_proxy_port,
+                skip_utf8_validation=self.skip_utf8_validation) \
             if self.has_auth_configured else\
             BaseHubConnection(
                 url=self.hub_url,
@@ -193,7 +211,12 @@ class HubConnectionBuilder(object):
                 headers=self.headers,
                 verify_ssl=self.verify_ssl,
                 skip_negotiation=self.skip_negotiation,
-                enable_trace=self.enable_trace)
+                enable_trace=self.enable_trace,
+                ping_interval=self.ping_interval,
+                proxy_type=self.proxy_type,
+                http_proxy_host=self.http_proxy_host,
+                http_proxy_port=self.http_proxy_port,
+                skip_utf8_validation=self.skip_utf8_validation)
             
     def with_automatic_reconnect(self, data: dict):
         """Configures automatic reconnection

@@ -23,6 +23,11 @@ class WebsocketTransport(BaseTransport):
             verify_ssl=False,
             skip_negotiation=False,
             enable_trace=False,
+            ping_interval=0,
+            proxy_type=None,
+            http_proxy_host=None,
+            http_proxy_port=None,
+            skip_utf8_validation=False,
             **kwargs):
         super(WebsocketTransport, self).__init__(**kwargs)
         self._ws = None
@@ -49,6 +54,12 @@ class WebsocketTransport(BaseTransport):
 
         if len(self.logger.handlers) > 0:
             websocket.enableTrace(self.enable_trace, self.logger.handlers[0])
+
+        self.ping_interval = ping_interval
+        self.proxy_type = proxy_type
+        self.http_proxy_host = http_proxy_host
+        self.http_proxy_port = http_proxy_port
+        self.skip_utf8_validation = skip_utf8_validation
     
     def is_running(self):
         return self.state != ConnectionState.disconnected
@@ -82,8 +93,12 @@ class WebsocketTransport(BaseTransport):
             
         self._thread = threading.Thread(
             target=lambda: self._ws.run_forever(
-                sslopt={"cert_reqs": ssl.CERT_NONE}
-                if not self.verify_ssl else {}
+                sslopt={"cert_reqs": ssl.CERT_NONE} if not self.verify_ssl else {},
+                ping_interval=self.ping_interval,
+                proxy_type=self.proxy_type,
+                http_proxy_host=self.http_proxy_host,
+                http_proxy_port=self.http_proxy_port,
+                skip_utf8_validation=self.skip_utf8_validation,
             ))
         self._thread.daemon = True
         self._thread.start()
