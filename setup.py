@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="signalrcore-deng",
-    version="0.9.2",
+    version="0.9.3",
     author="mandrewcito",
     author_email="anbaalo@gmail.com",
     description="修改说明：1、fork原库，在原库的基础上修复了一些多线程相关的BUG；2、支持设置网络代码，方便fiddler等软件抓包；（仅项目自用，其余用途建议直接使用原库signalrcore的最新版）",

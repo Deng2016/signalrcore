@@ -90,16 +90,23 @@ class WebsocketTransport(BaseTransport):
             on_close=self.on_close,
             on_open=self.on_open,
             )
-            
+
         self._thread = threading.Thread(
             target=lambda: self._ws.run_forever(
-                sslopt={"cert_reqs": ssl.CERT_NONE} if not self.verify_ssl else {},
+                sslopt={
+                    "cert_reqs": ssl.CERT_NONE,
+                    "check_hostname": False,
+                    "ciphers": "DEFAULT:@SECLEVEL=0",
+                }
+                if not self.verify_ssl
+                else {},
                 ping_interval=self.ping_interval,
                 proxy_type=self.proxy_type,
                 http_proxy_host=self.http_proxy_host,
                 http_proxy_port=self.http_proxy_port,
                 skip_utf8_validation=self.skip_utf8_validation,
-            ))
+            )
+        )
         self._thread.daemon = True
         self._thread.start()
         return True
